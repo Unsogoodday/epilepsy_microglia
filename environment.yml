@@ -1,4 +1,4 @@
-name: epilepsy_microglia
+name:epilepsy_microglia
 channels:
   - conda-forge
   - bioconda
@@ -24,3 +24,4 @@ dependencies:
       - liana==0.1.7
       - harmonypy
       - symphonypy
+

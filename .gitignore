@@ -1,6 +1,6 @@
 # Ignore local caches and generated plots, except the final ones
 /data
-/results
+/results/logs
 
 # Jupyter auto-saves
 **/.ipynb_checkpoints/**
@@ -16,7 +16,6 @@
 *.loom
 *.npz
 *.npy
-**/cache/
 *.pdf
 *.tar
 *.tar.gz

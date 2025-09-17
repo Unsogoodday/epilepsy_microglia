@@ -1,0 +1,23 @@
+# Ignore local caches and generated plots, except the final ones
+/data
+/results
+
+# Jupyter auto-saves
+**/.ipynb_checkpoints/**
+
+# Ignore most images
+*.png
+*.jpg
+*.pdf
+
+# Ignore other big binaries (global)
+*.h5ad
+*.h5
+*.loom
+*.npz
+*.npy
+**/cache/
+*.pdf
+*.tar
+*.tar.gz
+*.zip

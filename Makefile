@@ -6,55 +6,65 @@ DATA=data
 RESULTS=results
 
 # Default target
-all : preprocess analysis figures
+all: download preprocess integrate subset analysis figures
 
-# 1. Preprocess raw data into .h5ad
-$(DATA)/processed/done: $(DATA)/raw/*
-  $(PYTHON) $(SRC)/preprocessing.py \
-    --input $(DATA)/raw \
-    --output $(DATA)/processed \
-  touch $@
+# 1. Download and unpack datasets → data/raw
+$(DATA)/raw/done: datasets.txt
+	$(PYTHON) $(SRC)/download.py \
+		--datasets datasets.txt \
+		--outdir $(DATA)/raw
+	touch $@
 
-# 2. Integrate preprocessed data
+# 2. QC raw data → data/processed
+$(DATA)/processed/done: $(DATA)/raw/done
+	$(PYTHON) $(SRC)/preprocess.py \
+		--input $(DATA)/raw \
+		--output $(DATA)/processed
+	touch $@
+
+# 3. Integrate
 $(DATA)/integrated/done: $(DATA)/processed/done
-  $(PYTHON) $(SRC)/integration.py \
-    --input $(DATA)/processed \
-    --output $(DATA)/integrated
-  touch $@
+	$(PYTHON) $(SRC)/integration.py \
+		--input $(DATA)/processed \
+		--output $(DATA)/integrated
+	touch $@
 
-# 3. Subset desired cell types
+# 4. Subset
 $(DATA)/subset/done: $(DATA)/integrated/done
-  $(PYTHON) $(SRC)/subset.py \
-    --input $(DATA)/integrated \
-    --output $(DATA)/subset \
-  touch $@
+	$(PYTHON) $(SRC)/subset.py \
+		--input $(DATA)/integrated \
+		--output $(DATA)/subset
+	touch $@
 
-# 4. Downstream analysis on overall data
-$(RESULTS)/tables/integrated_done: $(DATA)/integrated/done 
-  $(PYTHON) $(SRC)/analysis_integrated.py \
-    --input $(DATA)/integrated \
-    --output $(RESULTS)/tables
-  touch $@
+# 5. Analysis (integrated)
+$(RESULTS)/tables/integrated_done: $(DATA)/integrated/done
+	$(PYTHON) $(SRC)/analysis_integrated.py \
+		--input $(DATA)/integrated \
+		--output $(RESULTS)/tables
+	touch $@
 
-# 5. Downstream analysis on subset data
+# 6. Analysis (subset)
 $(RESULTS)/tables/subset_done: $(DATA)/subset/done
 	$(PYTHON) $(SRC)/analysis_subset.py \
 		--input $(DATA)/subset \
 		--output $(RESULTS)/tables
 	touch $@
 
-# 6. Generate plots and figures (needs both analyses)
+# 7. Figures
 $(RESULTS)/figures/done: $(RESULTS)/tables/integrated_done $(RESULTS)/tables/subset_done
 	$(PYTHON) $(SRC)/plotting.py \
 		--input $(RESULTS)/tables \
 		--output $(RESULTS)/figures
 	touch $@
 
-# Alias so you can just run "make figures"
+
+# Aliases
+preprocess: $(DATA)/processed/done
+integrate: $(DATA)/integrated/done
+subset: $(DATA)/subset/done
+analysis: $(RESULTS)/tables/integrated_done $(RESULTS)/tables/subset_done
 figures: $(RESULTS)/figures/done
 
-# Utility: clean everything
+# Utility
 clean:
-	rm -rf $(DATA)/processed/* $(DATA)/integrated/* $(DATA)/subset/* \
-	       $(RESULTS)/tables/* $(RESULTS)/figures/*
-
+	rm -rf $(DATA)/* $(RESULTS)/*

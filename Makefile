@@ -6,7 +6,11 @@ DATA=data
 RESULTS=results
 
 # Default target
-all: download preprocess integrate subset analysis figures
+all: env download preprocess integrate subset analysis figures
+
+# 0. download environments
+env:
+	$(PYTHON) -m pip install -r requirements.txt
 
 # 1. Download and unpack datasets → data/raw
 $(DATA)/raw/done: datasets.txt
@@ -68,3 +72,4 @@ figures: $(RESULTS)/figures/done
 # Utility
 clean:
 	rm -rf $(DATA)/* $(RESULTS)/*
+

@@ -20,3 +20,6 @@
 *.tar
 *.tar.gz
 *.zip
+
+Colab_Notebooks/
+*_sync.ipynb
